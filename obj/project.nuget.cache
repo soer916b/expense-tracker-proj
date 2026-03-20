@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "O1sNCxkjuGg=",
+  "success": true,
+  "projectFilePath": "/home/soer916b/expense-tracker-proj/ExpenseTracker.Api/ExpenseTracker.Api.csproj",
+  "expectedPackageFiles": [
+    "/home/soer916b/.nuget/packages/microsoft.aspnetcore.openapi/10.0.4/microsoft.aspnetcore.openapi.10.0.4.nupkg.sha512",
+    "/home/soer916b/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
