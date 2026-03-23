@@ -98,4 +98,26 @@ app.MapDelete("/expenses/{id}", (int id) =>
 })
 .WithName("DeleteExpense");
 
+app.MapPut("/expenses/{id}", (int id, Expense expense) =>
+{
+    Expense? expenseToUpdate = null;
+    foreach (Expense existing_expense in expenses)
+    {
+        if (existing_expense.Id == id)
+        {
+            expenseToUpdate = existing_expense;
+        }
+    }
+    if (expenseToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    expenseToUpdate.Amount = expense.Amount;
+    expenseToUpdate.Category = expense.Category;
+    expenseToUpdate.Description = expense.Description;
+    expenseToUpdate.Date = expense.Date;
+    return Results.Ok(expenseToUpdate);
+})
+.WithName("UpdateExpense");
+
 app.Run();

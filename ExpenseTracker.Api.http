@@ -13,3 +13,29 @@ GET {{host}}/expenses
 Accept: application/json
 
 ###
+
+PUT {{host}}/expenses/1
+Content-Type: application/json
+
+{
+  "amount": 249.95,
+  "category": "Food",
+  "description": "Groceries from Netto",
+  "date": "2026-03-23"
+}
+
+###
+
+GET {{host}}/expenses/1
+
+###
+
+PUT {{host}}/expenses/999
+Content-Type: application/json
+
+{
+  "amount": 100.00,
+  "category": "Test",
+  "description": "Should not exist",
+  "date": "2026-03-23"
+}
