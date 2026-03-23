@@ -41,116 +41,66 @@ List<Expense> expenses =
     Category = "Indkøb",
     Description = "Aftensmad i Netto",
     Date = new DateOnly(2026, 3, 22)
-    },
-    new Expense
-    { 
-    Id = 2,
-    Amount = 100,
-    Category = "Øl",
-    Description = "Sjov",
-    Date = new DateOnly(2026, 3, 22)
-    },
-    new Expense
-    { 
-    Id = 3,
-    Amount = 10000,
-    Category = "Husleje",
-    Description = "Månedlig Husleje",
-    Date = new DateOnly(2026, 3, 22)
     }
 ];
 
-
 /**************************************/
-
 
 app.MapGet("/", () => "Welcome to the Expense Tracker!");
 
-
 /**************************************/
 
-
-app.MapGet("/expenses", () =>
+app.MapGet("/expenses", async (ExpenseContext db) =>
 {
-    return Results.Ok(expenses);
+    List <Expense> result = await db.Expenses.ToListAsync();
+    return Results.Ok(result);
 })
 .WithName("GetExpenses");
 
-
 /**************************************/
 
-
-app.MapGet("/expenses/{id}", (int id) =>
+app.MapGet("/expenses/{id}", async (ExpenseContext db, int id) =>
 {
-    foreach (Expense expense in expenses)
+    Expense? expense = await db.Expenses.FindAsync(id);
+    if (expense == null)
     {
-        if (id == expense.Id) 
-        {
-            return Results.Ok(expense);
-        } 
+        return Results.NotFound();
     }
-    return Results.NotFound();
+    return Results.Ok(expense);
 })
 .WithName("GetExpenseById");
 
-
 /**************************************/
 
+app.MapPost("/expenses", async (ExpenseContext db, Expense expense) =>
+{
+    await db.Expenses.AddAsync(expense);
+    await db.SaveChangesAsync();
 
-app.MapPost("/expenses", (Expense expense) =>
-{   
-    int newId = 1;
-    foreach (Expense existing_expense in expenses)
-    {
-        if (existing_expense.Id >= newId) {
-            newId = existing_expense.Id + 1;
-        }
-    }
-    expense.Id = newId;
-    expenses.Add(expense);
     return Results.Created($"/expenses/{expense.Id}", expense);
 })
 .WithName("CreateExpense");
 
-
 /**************************************/
 
-
-app.MapDelete("/expenses/{id}", (int id) =>
-{   
-    Expense? expenseToDelete = null;
-    foreach (Expense expense in expenses)
-    {
-        if (expense.Id == id)
-        {
-            expenseToDelete = expense;
-            break;
-        }
-    }
-    if (expenseToDelete == null)
+app.MapDelete("/expenses/{id}", async (ExpenseContext db, int id) =>
+{
+    Expense? expense = await db.Expenses.FindAsync(id);
+    if (expense == null)
     {
         return Results.NotFound();
     }
-    expenses.Remove(expenseToDelete);
-    return Results.Ok(expenseToDelete);
+    db.Expenses.Remove(expense);
+    await db.SaveChangesAsync();
+    return Results.Ok(expense);
 })
 .WithName("DeleteExpense");
 
-
 /**************************************/
 
-
-app.MapPut("/expenses/{id}", (int id, Expense expense) =>
+app.MapPut("/expenses/{id}", async (ExpenseContext db, int id, Expense expense) =>
 {
-    Expense? expenseToUpdate = null;
-    foreach (Expense existing_expense in expenses)
-    {
-        if (existing_expense.Id == id)
-        {
-            expenseToUpdate = existing_expense;
-            break;
-        }
-    }
+    Expense? expenseToUpdate = await db.Expenses.FindAsync(id);
     if (expenseToUpdate == null)
     {
         return Results.NotFound();
@@ -159,12 +109,11 @@ app.MapPut("/expenses/{id}", (int id, Expense expense) =>
     expenseToUpdate.Category = expense.Category;
     expenseToUpdate.Description = expense.Description;
     expenseToUpdate.Date = expense.Date;
+    await db.SaveChangesAsync();
     return Results.Ok(expenseToUpdate);
 })
 .WithName("UpdateExpense");
 
-
 /**************************************/
-
 
 app.Run();

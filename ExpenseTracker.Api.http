@@ -5,7 +5,7 @@ Accept: application/json
 
 ###
 
-DELETE {{host}}/expenses/2
+DELETE {{host}}/expenses/4
 
 ###
 
@@ -14,12 +14,12 @@ Accept: application/json
 
 ###
 
-PUT {{host}}/expenses/1
+PUT {{host}}/expenses/5
 Content-Type: application/json
 
 {
   "amount": 249.95,
-  "category": "Food",
+  "category": "Beer",
   "description": "Groceries from Netto",
   "date": "2026-03-23"
 }
@@ -37,5 +37,18 @@ Content-Type: application/json
   "amount": 100.00,
   "category": "Test",
   "description": "Should not exist",
+  "date": "2026-03-23"
+}
+
+###
+
+POST {{host}}/expenses
+Content-Type: application/json
+
+{
+  "id": 4,
+  "amount": 70,
+  "category": "Beer",
+  "description": "Lunch",
   "date": "2026-03-23"
 }
