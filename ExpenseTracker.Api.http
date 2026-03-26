@@ -21,7 +21,14 @@ Accept: application/json
 GET {{host}}/expenses/1
 Accept: application/json
 
+
+### Get expenses tests:
+GET {{host}}/expenses
+Accept: application/json
+
 ###
+GET {{host}}/expenses?startDate=2026-03-01&endDate=2026-03-31
+Accept: application/json
 
 ### Create valid expense 1
 POST {{host}}/expenses

@@ -40,26 +40,41 @@ app.MapGet("/", () => "Welcome to the Expense Tracker!");
 
 // Expense endpoints
 
-app.MapGet("/expenses", async (ExpenseContext db, string? category) =>
+app.MapGet("/expenses", async (ExpenseContext db, string? category, DateOnly? startDate, DateOnly? endDate) =>
 {
-    if (category == null)
-    {
-        List<Expense> expenses = await db.Expenses.ToListAsync();
-        return Results.Ok(expenses);
-    }
-    if (string.IsNullOrWhiteSpace(category))
+    var query = db.Expenses.AsQueryable();
+
+    // Validating input:
+    if (category != null && string.IsNullOrWhiteSpace(category))
     {
         return Results.BadRequest("Category must not be blank.");
     }
-    if (!permittedCategories.Contains(category))
+    if (category != null && !permittedCategories.Contains(category))
     {
         return Results.BadRequest($"Category must be set to one of the following: {string.Join(", ", permittedCategories)}");
     }
-    
-    List<Expense> filteredExpenses = await db.Expenses.Where(
-        expense => expense.Category == category).ToListAsync();
+    if (startDate != null && endDate != null && startDate > endDate)
+    {
+        return Results.BadRequest("Start-date must not be greater than End-date");
+    }
 
-    return Results.Ok(filteredExpenses);
+    // Querying:
+    if (category != null)
+    {
+        query = query.Where(expense => expense.Category == category);
+    }
+    if (startDate != null)
+    {
+        query = query.Where(expense => expense.Date >= startDate);
+    }
+    if (endDate != null)
+    {
+        query = query.Where(expense => expense.Date <= endDate);
+    }
+
+    List<Expense> expenses = await query.ToListAsync();
+
+    return Results.Ok(expenses);
 })
 .WithName("GetExpenses");
 
