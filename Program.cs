@@ -40,7 +40,9 @@ app.MapGet("/", () => "Welcome to the Expense Tracker!");
 
 // Expense endpoints
 
-app.MapGet("/expenses", async (ExpenseContext db, string? category, DateOnly? startDate, DateOnly? endDate) =>
+app.MapGet("/expenses", async (ExpenseContext db, 
+                                string? category, DateOnly? startDate, DateOnly? endDate, 
+                                string? sortBy, string? sortOrder) =>
 {
     var query = db.Expenses.AsQueryable();
 
@@ -55,10 +57,22 @@ app.MapGet("/expenses", async (ExpenseContext db, string? category, DateOnly? st
     }
     if (startDate != null && endDate != null && startDate > endDate)
     {
-        return Results.BadRequest("Start-date must not be greater than End-date");
+        return Results.BadRequest("Start-date must not be greater than End-date.");
+    }
+    if (sortBy == null && sortOrder != null)
+    {
+        return Results.BadRequest("sortOrder requires sortBy to be set.");
+    }
+    if (sortBy != null && sortBy != "date" && sortBy != "amount")
+    {
+        return Results.BadRequest("sortBy must be either [date] or [amount]");
+    }
+    if (sortOrder != null && sortOrder != "asc" && sortOrder != "desc")
+    {
+        return Results.BadRequest("sortOrder must be either [asc] or [desc]");
     }
 
-    // Querying:
+    // Filtering:
     if (category != null)
     {
         query = query.Where(expense => expense.Category == category);
@@ -72,6 +86,29 @@ app.MapGet("/expenses", async (ExpenseContext db, string? category, DateOnly? st
         query = query.Where(expense => expense.Date <= endDate);
     }
 
+    // Sorting:
+    if (sortBy == "date")
+    {
+        if (sortOrder == "desc") 
+        {
+            query = query.OrderByDescending(expense => expense.Date);
+        } 
+        else 
+        {
+            query = query.OrderBy(expense => expense.Date);
+        }   
+    }
+    else if (sortBy == "amount")
+    {
+        if (sortOrder == "desc") 
+        {
+            query = query.OrderByDescending(expense => expense.Amount);
+        } 
+        else
+        {
+            query = query.OrderBy(expense => expense.Amount);
+        }   
+    }
     List<Expense> expenses = await query.ToListAsync();
 
     return Results.Ok(expenses);

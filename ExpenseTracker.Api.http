@@ -18,8 +18,10 @@ GET {{host}}/expenses?category=
 Accept: application/json
 
 ### Get single expense by id
-GET {{host}}/expenses/1
+GET {{host}}/expenses?sortBy=amount&sortOrder=desc
 Accept: application/json
+
+### testing sorting:
 
 
 ### Get expenses tests:
@@ -204,3 +206,25 @@ Accept: application/json
 ### Invalid summary input: month = 13
 GET {{host}}/expenses/summary?year=2026&month=13
 Accept: application/json
+
+
+### Filter by category and sort by amount ascending
+GET {{host}}/expenses?category=Food&sortBy=amount
+
+### Filter by category and sort by amount descending
+GET {{host}}/expenses?category=Food&sortBy=amount&sortOrder=desc
+
+### Filter by date interval and sort by date ascending
+GET {{host}}/expenses?startDate=2026-03-01&endDate=2026-03-31&sortBy=date
+
+### Filter by date interval and sort by date descending
+GET {{host}}/expenses?startDate=2026-03-01&endDate=2026-03-31&sortBy=date&sortOrder=desc
+
+### Filter by category and date interval, then sort by amount descending
+GET {{host}}/expenses?category=Groceries&startDate=2026-03-01&endDate=2026-03-31&sortBy=amount&sortOrder=desc
+
+### Filter by category and start date only, then sort by date
+GET {{host}}/expenses?category=Transport&startDate=2026-03-01&sortBy=date
+
+### Filter by category and end date only, then sort by amount
+GET {{host}}/expenses?category=Bills&endDate=2026-03-31&sortBy=amount
